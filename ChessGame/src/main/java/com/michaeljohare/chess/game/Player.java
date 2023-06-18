@@ -2,6 +2,9 @@ package com.michaeljohare.chess.game;
 
 import com.michaeljohare.chess.pieces.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private String player;
     private ChessPiece[] playerPieces = new ChessPiece[16];
@@ -49,7 +52,55 @@ public class Player {
         }
     }
 
+    public ChessPiece getPlayerPiece(Square square) {
+        for (ChessPiece playerPiece : playerPieces) {
+            if (playerPiece.isAlive() && playerPiece.getCurrentSquare().equals(square)) {
+                return playerPiece;
+            }
+        }
+        return null;
+    }
+    public List<Square> getMoves() {
+        List<Square> availableMoves = new ArrayList<>();
+        for (ChessPiece playerPiece : playerPieces) {
+            if (playerPiece.isAlive()) {
+                availableMoves.addAll(playerPiece.getMoves());
+            }
+        }
+        return availableMoves;
+    }
+
     public String getPlayer() {
         return player;
+    }
+    public King getKing() {
+        return (King) playerPieces[12];
+    }
+
+    public void capturePiece(ChessPiece piece) {
+        for (int i = 0; i < 16; i++) {
+            if (playerPieces[i].equals(piece) && playerPieces[i].isAlive()) {
+                playerPieces[i].capture();
+                break;
+            }
+        }
+    }
+    public void undoCapturePiece(ChessPiece piece) {
+        for (int i = 0; i < 16; i++) {
+            if (!playerPieces[i].isAlive() && playerPieces[i].isAlive()) {
+                piece.undoCapture();
+                break;
+            }
+        }
+    }
+
+    public void promotePawn(ChessPiece piece) {
+        Board.board[piece.getCurrentSquare().getX()][piece.getCurrentSquare().getY()] = piece.getChessPieceConstant() +
+                getPlayer();
+        for (int i = 0; i < 16; i++) {
+            if (playerPieces[i].equals(piece.getCurrentSquare())) {
+                playerPieces[i] = piece;
+            }
+        }
     }
 }
