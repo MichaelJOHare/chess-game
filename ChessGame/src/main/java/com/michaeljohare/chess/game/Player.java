@@ -6,6 +6,11 @@ public class Player {
     private String player;
     private ChessPiece[] playerPieces = new ChessPiece[16];
 
+    public Player(String player) {
+        this.player = player;
+        setPieces();
+    }
+
     private void setPieces() {
         if (player.equals(Board.PLAYER_1)) {
             playerPieces[0] = new Pawn(new Square(6, 0), this);
@@ -42,5 +47,9 @@ public class Player {
             playerPieces[14] = new Knight(new Square(0, 6), this);
             playerPieces[15] = new Rook(new Square(0, 7), this);
         }
+    }
+
+    public String getPlayer() {
+        return player;
     }
 }

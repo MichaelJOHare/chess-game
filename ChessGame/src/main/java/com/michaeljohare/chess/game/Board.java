@@ -65,7 +65,7 @@ public class Board {
         }
         System.out.println();
         for (int i = 1; i < 9; i++) {
-            System.out.print("\t" + "  " + legendNumber[i-1] + "\t");
+            System.out.print("\t" + " " + "\u2005" + legendNumber[i-1] + "\t");
         }
         System.out.println("\n\n");
     }
