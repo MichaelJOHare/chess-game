@@ -98,7 +98,7 @@ public class Player {
         Board.board[piece.getCurrentSquare().getX()][piece.getCurrentSquare().getY()] = piece.getChessPieceConstant() +
                 getPlayer();
         for (int i = 0; i < 16; i++) {
-            if (playerPieces[i].equals(piece.getCurrentSquare())) {
+            if (playerPieces[i].getCurrentSquare().equals(piece.getCurrentSquare())) {
                 playerPieces[i] = piece;
             }
         }

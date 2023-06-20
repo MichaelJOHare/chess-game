@@ -23,13 +23,13 @@ public abstract class ChessPiece {
     public abstract List<Square> getMoves();
     public abstract String getChessPieceConstant();
 
-    public void moviePiece(Square end) {
+    public void movePiece(Square end) {
         board[end.getX()][end.getY()] = getChessPieceConstant() + player.getPlayer();
         board[currentSquare.getX()][currentSquare.getY()] = EMPTY;
         lastSquare = currentSquare;
         currentSquare = end;
     }
-    public void undoMoviePiece(String piece) {
+    public void undoMovePiece(String piece) {
         board[lastSquare.getX()][lastSquare.getY()] = getChessPieceConstant() + player.getPlayer();
         board[currentSquare.getX()][currentSquare.getY()] = piece;
         currentSquare = lastSquare;
