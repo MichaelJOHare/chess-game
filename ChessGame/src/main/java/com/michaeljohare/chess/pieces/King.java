@@ -223,29 +223,37 @@ public class King extends ChessPiece {
         List<Square> availableMoves = new ArrayList<>();
         if (x < 7 && isEmpty(x + 1, y)) {
             movePiece(new Square(x + 1, y));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y));
+            }
             undoMovePiece(EMPTY);
         }
         if (x > 0 && isEmpty(x - 1, y)) {
             movePiece(new Square(x - 1, y));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y));
+            }
             undoMovePiece(EMPTY);
         }
 
         // Castling rights + do or not do castling
         if (y < 7 && isEmpty(x, y + 1)) {
             movePiece(new Square(x, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x, y + 1));
+            }
             undoMovePiece(EMPTY);
             if(player.getPlayer().equals(PLAYER_1)) {
                 if (!player.getKing().isInCheck() && y < 6 && isEmpty(x, y+2) &&
                         currentSquare.equals(new Square(7, 4)) && !hasMoved && board[7][7].equals(ROOK + PLAYER_1)) {
                     Rook rook = (Rook)player.getPlayerPiece(new Square(7,7));
-                    if(!rook.isAbleToCastle()) {
+                    if(rook.isAbleToCastle()) {
                         movePiece(new Square(7, 6));
                         rook.movePiece(new Square(7,5));
                     }
-                    if(!player.getKing().isInCheck()) availableMoves.add(new Square(7,6));
+                    if(!player.getKing().isInCheck()) {
+                        availableMoves.add(new Square(7,6));
+                    }
                     undoMovePiece(EMPTY);
                     rook.undoMovePiece(EMPTY);
                 }
@@ -253,28 +261,34 @@ public class King extends ChessPiece {
             else if(!player.getKing().isInCheck() && y < 6 && isEmpty(x, y+2) &&
                     currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][7].equals(ROOK + PLAYER_1)) {
                 Rook rook = (Rook)player.getPlayerPiece(new Square(0,7));
-                if(!rook.isAbleToCastle()) {
+                if(rook.isAbleToCastle()) {
                     movePiece(new Square(0, 6));
                     rook.movePiece(new Square(0,5));
                 }
-                if(!player.getKing().isInCheck()) availableMoves.add(new Square(0,6));
+                if(!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(0,6));
+                }
                 undoMovePiece(EMPTY);
                 rook.undoMovePiece(EMPTY);
             }
         }
         if (y > 0 && isEmpty(x, y - 1)) {
             movePiece(new Square(x, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x, y - 1));
+            }
             undoMovePiece(EMPTY);
             if(player.getPlayer().equals(PLAYER_1)) {
                 if (!player.getKing().isInCheck() && y>1 &&isEmpty(x, y-2) &&
                         currentSquare.equals(new Square(7, 4)) && !hasMoved && board[7][0].equals(ROOK + PLAYER_1)) {
                     Rook rook = (Rook)player.getPlayerPiece(new Square(7,0));
-                    if(!rook.isAbleToCastle()) {
+                    if(rook.isAbleToCastle()) {
                         movePiece(new Square(7, 2));
                         rook.movePiece(new Square(7,3));
                     }
-                    if(!player.getKing().isInCheck()) availableMoves.add(new Square(7,2));
+                    if(!player.getKing().isInCheck()) {
+                        availableMoves.add(new Square(7,2));
+                    }
                     undoMovePiece(EMPTY);
                     rook.undoMovePiece(EMPTY);
                 }
@@ -282,11 +296,13 @@ public class King extends ChessPiece {
             else if(!player.getKing().isInCheck() && y>1 && isEmpty(x, y-2) && 
                     currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][0].equals(ROOK + PLAYER_1)) {
                 Rook rook = (Rook)player.getPlayerPiece(new Square(0,0));
-                if(!rook.isAbleToCastle()) {
+                if(rook.isAbleToCastle()) {
                     movePiece(new Square(0, 2));
                     rook.movePiece(new Square(0,3));
                 }
-                if(!player.getKing().isInCheck()) availableMoves.add(new Square(0,2));
+                if(!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(0,2));
+                }
                 undoMovePiece(EMPTY);
                 rook.undoMovePiece(EMPTY);
             }
@@ -295,71 +311,95 @@ public class King extends ChessPiece {
         // King moves
         if (x < 7 && y < 7 && isEmpty(x + 1, y + 1)) {
             movePiece(new Square(x + 1, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y + 1));
+            }
             undoMovePiece(EMPTY);
         }
         if (x < 7 && y > 0 && isEmpty(x + 1, y - 1)) {
             movePiece(new Square(x + 1, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y - 1));
+            }
             undoMovePiece(EMPTY);
         }
         if (x > 0 && y < 7 && isEmpty(x - 1, y + 1)) {
             movePiece(new Square(x - 1, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y + 1));
+            }
             undoMovePiece(EMPTY);
         }
         if (x > 0 && y > 0 && isEmpty(x - 1, y - 1)) {
             movePiece(new Square(x - 1, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y - 1));
+            }
             undoMovePiece(EMPTY);
         }
 
         if (x < 7 && !isEmpty(x + 1, y) && !player.getPlayer().equals(board[x + 1][y].substring(1))) {
             String piece = board[x + 1][y];
             movePiece(new Square(x + 1, y));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y));
+            }
             undoMovePiece(piece);
         }
         if (x > 0 && !isEmpty(x - 1, y) && !player.getPlayer().equals(board[x - 1][y].substring(1))) {
             String piece = board[x - 1][y];
             movePiece(new Square(x - 1, y));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y));
+            }
             undoMovePiece(piece);
         }
         if (y < 7 && !isEmpty(x, y + 1) && !player.getPlayer().equals(board[x][y + 1].substring(1))) {
             String piece = board[x][y + 1];
             movePiece(new Square(x, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x, y + 1));
+            }
             undoMovePiece(piece);
         }
         if (y > 0 && !isEmpty(x, y - 1) && !player.getPlayer().equals(board[x][y - 1].substring(1))) {
             String piece = board[x][y - 1];
             movePiece(new Square(x, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x, y - 1));
+            }
             undoMovePiece(piece);
         }
         if (x < 7 && y < 7 && !isEmpty(x + 1, y + 1) && !player.getPlayer().equals(board[x + 1][y + 1].substring(1))) {
             String piece = board[x + 1][y + 1];
             movePiece(new Square(x + 1, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y + 1));
+            }
             undoMovePiece(piece);
         }
         if (x < 7 && y > 0 && !isEmpty(x + 1, y - 1) && !player.getPlayer().equals(board[x + 1][y - 1].substring(1))) {
             String piece = board[x + 1][y - 1];
             movePiece(new Square(x + 1, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x + 1, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x + 1, y - 1));
+            }
             undoMovePiece(piece);
         }
         if (x > 0 && y < 7 && !isEmpty(x - 1, y + 1) && !player.getPlayer().equals(board[x - 1][y + 1].substring(1))) {
             String piece = board[x - 1][y + 1];
             movePiece(new Square(x - 1, y + 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y + 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y + 1));
+            }
             undoMovePiece(piece);
         }
         if (x > 0 && y > 0 && !isEmpty(x - 1, y - 1) && !player.getPlayer().equals(board[x - 1][y - 1].substring(1))) {
             String piece = board[x - 1][y - 1];
             movePiece(new Square(x - 1, y - 1));
-            if (!player.getKing().isInCheck()) availableMoves.add(new Square(x - 1, y - 1));
+            if (!player.getKing().isInCheck()) {
+                availableMoves.add(new Square(x - 1, y - 1));
+            }
             undoMovePiece(piece);
         }
         return availableMoves;

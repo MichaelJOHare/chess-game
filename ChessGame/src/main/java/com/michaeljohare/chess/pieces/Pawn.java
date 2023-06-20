@@ -3,9 +3,10 @@ package com.michaeljohare.chess.pieces;
 import com.michaeljohare.chess.game.Player;
 import com.michaeljohare.chess.game.Square;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.michaeljohare.chess.game.Board.PAWN;
+import static com.michaeljohare.chess.game.Board.*;
 
 public class Pawn extends ChessPiece {
     public Pawn(Square currentSquare, Player player) {
@@ -14,7 +15,78 @@ public class Pawn extends ChessPiece {
 
     @Override
     public List<Square> getMoves() {
-        return null;
+        int x = currentSquare.getX(), y = currentSquare.getY();
+        List<Square> availableMoves = new ArrayList<>();
+        if (player.getPlayer().equals(PLAYER_1)) {
+            if (x > 0 && isEmpty(x - 1, y)) {
+                movePiece(new Square(x - 1, y));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x - 1, y));
+                }
+                undoMovePiece(EMPTY);
+                if (x == 6 && isEmpty(x - 2, y)) {
+                    movePiece(new Square(x - 2, y));
+                    if (!player.getKing().isInCheck()) {
+                        availableMoves.add(new Square(x - 2, y));
+                    }
+                    undoMovePiece(EMPTY);
+                }
+            }
+            if (x > 0 && y < 7 && !isEmpty(x - 1, y + 1) &&
+                    !player.getPlayer().equals(board[x - 1][y + 1].substring(1))) {
+                String piece = board[x - 1][y + 1];
+                movePiece(new Square(x - 1, y + 1));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x - 1, y + 1));
+                }
+                undoMovePiece(piece);
+            }
+            if (y > 0 && x > 0 && !isEmpty(x - 1, y - 1) &&
+                    !player.getPlayer().equals(board[x - 1][y - 1].substring(1))) {
+                String piece = board[x - 1][y - 1];
+                movePiece(new Square(x - 1, y - 1));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x - 1, y - 1));
+                }
+                undoMovePiece(piece);
+            }
+        }
+
+        if (player.getPlayer().equals(PLAYER_2)) {
+            if (x < 7 && isEmpty(x + 1, y)) {
+                movePiece(new Square(x + 1, y));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x + 1, y));
+                }
+                undoMovePiece(EMPTY);
+                if (x == 1 && isEmpty(x + 2, y)) {
+                    movePiece(new Square(x + 2, y));
+                    if (!player.getKing().isInCheck()) {
+                        availableMoves.add(new Square(x + 2, y));
+                    }
+                    undoMovePiece(EMPTY);
+                }
+            }
+            if (x < 7 && y < 7 && !isEmpty(x + 1, y + 1) &&
+                    !player.getPlayer().equals(board[x + 1][y + 1].substring(1))) {
+                String piece = board[x + 1][y + 1];
+                movePiece(new Square(x + 1, y + 1));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x + 1, y + 1));
+                }
+                undoMovePiece(piece);
+            }
+            if (x < 7 && y > 0 && !isEmpty(x + 1, y - 1) &&
+                    !player.getPlayer().equals(board[x + 1][y - 1].substring(1))) {
+                String piece = board[x + 1][y - 1];
+                movePiece(new Square(x + 1, y - 1));
+                if (!player.getKing().isInCheck()) {
+                    availableMoves.add(new Square(x + 1, y - 1));
+                }
+                undoMovePiece(piece);
+            }
+        }
+        return availableMoves;
     }
 
 

@@ -12,7 +12,7 @@ public class Board {
     public static final String EMPTY = "  ";
     public static String[][] board = new String[8][8];
     public static String[] legendLetter = { "A", "B", "C", "D", "E", "F", "G", "H" };
-    public static String[] legendNumber = { "1", "2", "3", "4", "5", "6", "7", "8" };
+    public static String[] legendNumber = { "8", "7", "6", "5", "4", "3", "2", "1" };
 
     public static void initializeBoard() {
         for (int i = 0; i < 8; i++) {
@@ -54,18 +54,23 @@ public class Board {
     public static void displayBoard() {
         System.out.println();
         for (int i = 0; i < 8; i++) {
-            System.out.print(legendLetter[i] + "|");
+            System.out.print(legendNumber[i] + "|");
             for (int j = 0; j < 8; j++) {
-                System.out.print("\t" + "[" + board[i][j] + "]");
+                System.out.print("  " + "[" + board[i][j] + "]");
             }
             System.out.println();
         }
-        for (int j = 1; j < 9; j++) {
-            System.out.print("\t" + " " + "__" + "\t");
+        System.out.print("\t" + " " + "__");
+        for (int j = 1; j < 8; j++) {
+            System.out.print("    " + "__");
         }
         System.out.println();
         for (int i = 1; i < 9; i++) {
-            System.out.print("\t" + " " + "\u2005" + legendNumber[i-1] + "\t");
+            if (i == 1) {
+                System.out.print("\u2005" + "     " + legendLetter[i-1]);
+            } else {
+                System.out.print("     " + legendLetter[i-1]);
+            }
         }
         System.out.println("\n\n");
     }

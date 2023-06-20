@@ -12,10 +12,6 @@ public class Play {
     private int turnCounter;
     private boolean hasCastled = false;
 
-    private boolean isEmpty(int x, int y) {
-        return board[x][y].equals(EMPTY);
-    }
-
     private Player player1 = new Player(PLAYER_1);
     private Player player2 = new Player(PLAYER_2);
     private ChessPiece capturedPiece;
@@ -91,7 +87,7 @@ public class Play {
                         }
                     }
                 }
-            } catch (NullPointerException e) {
+            } catch (Exception e) {
                 System.out.println("\n\nYou can only undo a previous move one time\n");
                 turnCounter++;
             }
@@ -99,22 +95,28 @@ public class Play {
             play();
         }
 
-        if (playerInput.length() > 2) {
+        int x = -1;
+        int y = -1;
+        try {
+            x = (8 - Integer.parseInt(playerInput.substring(1)));
+            for (int i = 0; i < legendLetter.length; i++) {
+                if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
+                    y = i;
+                    break;
+                }
+            }
+        } catch (Exception e) {
             System.out.println("\nInvalid selection, try again.");
             play();
         }
 
-        int x = Integer.parseInt(playerInput.substring(1));
-        int y = -1;
-        for (int i = 0; i < legendLetter.length; i++) {
-            if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
-                y = i;
-                break;
+        try {
+            if (isEmpty(x, y)) {
+                System.out.println("\nThere is not a selectable piece in the square you chose");
+                play();
             }
-        }
-
-        if (isEmpty(x, y)) {
-            System.out.println("There is not a selectable piece in the square you chose");
+        } catch (Exception e) {
+            System.out.println("\nInvalid selection, try again.");
             play();
         }
 
@@ -125,7 +127,7 @@ public class Play {
         }
 
         if (playerPiece == null) {
-            System.out.println("You must choose your own piece\n");
+            System.out.println("\nYou must choose your own piece\n");
         } else {
             List<Square> moves = playerPiece.getMoves();
             if (moves.size() == 0) {
@@ -139,13 +141,19 @@ public class Play {
             System.out.print("\nEnter the corresponding letter/number combination of the square you " +
                     "would like to move to >>> ");
             playerInput = userInput.nextLine();
-            x = Integer.parseInt(playerInput.substring(1));
+            x = -1;
             y = -1;
-            for (int i = 0; i < legendLetter.length; i++) {
-                if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
-                    y = i;
-                    break;
+            try {
+                x = (8 - Integer.parseInt(playerInput.substring(1)));
+                for (int i = 0; i < legendLetter.length; i++) {
+                    if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
+                        y = i;
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println("Square selection was not a valid input, try again.");
+                play();
             }
 
             if (moves.contains(new Square(x, y))) {
@@ -156,7 +164,8 @@ public class Play {
                         player2.capturePiece(capturedPiece);
                         hasCastled = false;
                         if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
-                            System.out.print("What do you want to promote to?" +
+                            System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                    "to promote to rook" +
                                     "\n\n1)Rook" +
                                     "\n2)Knight" +
                                     "\n3)Bishop" +
@@ -169,7 +178,8 @@ public class Play {
                         player1.capturePiece(capturedPiece);
                         hasCastled = false;
                         if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
-                            System.out.print("What do you want to promote to?" +
+                            System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                    "to promote to rook" +
                                     "\n\n1)Rook" +
                                     "\n2)Knight" +
                                     "\n3)Bishop" +
@@ -207,7 +217,8 @@ public class Play {
                     }
                     if(playerPiece instanceof Rook) ((Rook)playerPiece).hasMoved = true;
                     if(playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
-                        System.out.print("What do you want to promote?" +
+                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                "to promote to rook" +
                                 "\n\n1)Rook" +
                                 "\n2)Knight" +
                                 "\n3)Bishop" +
@@ -216,12 +227,13 @@ public class Play {
                         pawnPromote(x, y, player1);
                     }
                     if(playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
-                        System.out.print("What do you want to promote?" +
+                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                "to promote to rook" +
                                 "\n\n1)Rook" +
                                 "\n2)Knight" +
                                 "\n3)Bishop" +
                                 "\n4)Queen" +
-                                "\n\nEnter your choice: ");
+                                "\n\nEnter your choice >>> ");
                         pawnPromote(x, y, player2);
                     }
                 }
@@ -229,6 +241,11 @@ public class Play {
             }
         }
         if ((turnCounter % 2 == 0 && player2.getKing().isInCheck())
-                || (turnCounter % 2 == 1 && player1.getKing().isInCheck())) System.out.println("\n\nCheck!");
+                || (turnCounter % 2 == 1 && player1.getKing().isInCheck())) {
+            System.out.println("\n\nCheck!");
+        }
+    }
+    private boolean isEmpty(int x, int y) {
+        return board[x][y].equals(EMPTY);
     }
 }

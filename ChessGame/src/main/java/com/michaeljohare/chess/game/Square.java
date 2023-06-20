@@ -1,5 +1,7 @@
 package com.michaeljohare.chess.game;
 
+import static com.michaeljohare.chess.game.Board.*;
+
 public class Square {
     private int x;
     private int y;
@@ -28,6 +30,6 @@ public class Square {
 
     @Override
     public String toString() {
-        return "[" + x +"," + y + "]";
+        return legendLetter[y] + legendNumber[x];
     }
 }
