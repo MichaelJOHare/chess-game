@@ -41,6 +41,8 @@ public class Play {
 
     public void play() {
         displayBoard();
+        int x = -1;
+        int y = -1;
 
         if (turnCounter % 2 == 0) {
             System.out.println("It's Player 1's turn to make a move\n");
@@ -95,31 +97,35 @@ public class Play {
             play();
         }
 
-        int x = -1;
-        int y = -1;
-        try {
-            x = (8 - Integer.parseInt(playerInput.substring(1)));
-            for (int i = 0; i < legendLetter.length; i++) {
-                if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
-                    y = i;
-                    break;
+        if (!playerInput.equalsIgnoreCase("undo")) {
+            try {
+                x = (8 - Integer.parseInt(playerInput.substring(1)));
+                for (int i = 0; i < legendLetter.length; i++) {
+                    if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
+                        y = i;
+                        break;
+                    }
                 }
-            }
-        } catch (Exception e) {
-            System.out.println("\nInvalid selection, try again.");
-            play();
-        }
-
-        try {
-            if (isEmpty(x, y)) {
-                System.out.println("\nThere is not a selectable piece in the square you chose");
+            } catch (Exception e) {
+                System.out.println("\nInvalid selection, try again.");
                 play();
             }
-        } catch (Exception e) {
-            System.out.println("\nInvalid selection, try again.");
-            play();
         }
 
+        if (!playerInput.equalsIgnoreCase("undo")) {
+            try {
+                if (isEmpty(x, y)) {
+                    System.out.println("\nThere is not a selectable piece in the square you chose");
+                    play();
+                }
+            } catch (Exception e) {
+                System.out.println("\nInvalid selection, try again.");
+                play();
+            }
+        }
+//  Player piece being assigned null after undo... Figure out how to stop from happening.  Previous changes:
+//  if !equals undo for try catch blocks, moving int initialization to top of class
+//  Maybe make int x, int y instance variables?
         if (turnCounter % 2 == 0) {
             playerPiece = player1.getPlayerPiece(new Square(x, y));
         } else {
@@ -240,8 +246,8 @@ public class Play {
                 turnCounter++;
             }
         }
-        if ((turnCounter % 2 == 0 && player2.getKing().isInCheck())
-                || (turnCounter % 2 == 1 && player1.getKing().isInCheck())) {
+        if ((turnCounter % 2 == 0 && player1.getKing().isInCheck())
+                || (turnCounter % 2 == 1 && player2.getKing().isInCheck())) {
             System.out.println("\n\nCheck!");
         }
     }
