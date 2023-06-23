@@ -123,52 +123,104 @@ public class Play {
                 play();
             }
         }
-//  Player piece being assigned null after undo... Figure out how to stop from happening.  Previous changes:
-//  if !equals undo for try catch blocks, moving int initialization to top of class
-//  Maybe make int x, int y instance variables?
-        if (turnCounter % 2 == 0) {
-            playerPiece = player1.getPlayerPiece(new Square(x, y));
-        } else {
-            playerPiece = player2.getPlayerPiece(new Square(x, y));
-        }
 
-        if (playerPiece == null) {
-            System.out.println("\nYou must choose your own piece\n");
-        } else {
-            List<Square> moves = playerPiece.getMoves();
-            if (moves.size() == 0) {
-                System.out.println("\nThe piece you selected does not have any legal moves");
-                play();
+        if (!playerInput.equalsIgnoreCase("undo")) {
+            if (turnCounter % 2 == 0) {
+                playerPiece = player1.getPlayerPiece(new Square(x, y));
+            } else {
+                playerPiece = player2.getPlayerPiece(new Square(x, y));
             }
-            System.out.println("\nThese are the available moves");
-            for (Square square : moves) {
-                System.out.println(square);
-            }
-            System.out.print("\nEnter the corresponding letter/number combination of the square you " +
-                    "would like to move to >>> ");
-            playerInput = userInput.nextLine();
-            x = -1;
-            y = -1;
-            try {
-                x = (8 - Integer.parseInt(playerInput.substring(1)));
-                for (int i = 0; i < legendLetter.length; i++) {
-                    if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
-                        y = i;
-                        break;
-                    }
+
+            if (playerPiece == null) {
+                System.out.println("\nYou must choose your own piece\n");
+            } else {
+                List<Square> moves = playerPiece.getMoves();
+                if (moves.size() == 0) {
+                    System.out.println("\nThe piece you selected does not have any legal moves");
+                    play();
                 }
-            } catch (Exception e) {
-                System.out.println("Square selection was not a valid input, try again.");
-                play();
-            }
+                System.out.println("\nThese are the available moves");
+                for (Square square : moves) {
+                    System.out.println(square);
+                }
+                System.out.print("\nEnter the corresponding letter/number combination of the square you " +
+                        "would like to move to >>> ");
+                playerInput = userInput.nextLine();
+                x = -1;
+                y = -1;
+                try {
+                    x = (8 - Integer.parseInt(playerInput.substring(1)));
+                    for (int i = 0; i < legendLetter.length; i++) {
+                        if (playerInput.substring(0, 1).equalsIgnoreCase(legendLetter[i])) {
+                            y = i;
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Square selection was not a valid input, try again.");
+                    play();
+                }
 
-            if (moves.contains(new Square(x, y))) {
-                if (!isEmpty(x, y)) {
-                    playerPiece.movePiece(new Square(x, y));
-                    if (turnCounter % 2 == 0) {
-                        capturedPiece = player2.getPlayerPiece(new Square(x, y));
-                        player2.capturePiece(capturedPiece);
+                if (moves.contains(new Square(x, y))) {
+                    if (!isEmpty(x, y)) {
+                        playerPiece.movePiece(new Square(x, y));
+                        if (turnCounter % 2 == 0) {
+                            capturedPiece = player2.getPlayerPiece(new Square(x, y));
+                            player2.capturePiece(capturedPiece);
+                            hasCastled = false;
+                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
+                                System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                        "to promote to rook" +
+                                        "\n\n1)Rook" +
+                                        "\n2)Knight" +
+                                        "\n3)Bishop" +
+                                        "\n4)Queen" +
+                                        "\n\nEnter your choice >>> ");
+                                pawnPromote(x, y, player1);
+                            }
+                        } else {
+                            capturedPiece = player1.getPlayerPiece(new Square(x, y));
+                            player1.capturePiece(capturedPiece);
+                            hasCastled = false;
+                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
+                                System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
+                                        "to promote to rook" +
+                                        "\n\n1)Rook" +
+                                        "\n2)Knight" +
+                                        "\n3)Bishop" +
+                                        "\n4)Queen" +
+                                        "\n\nEnter your choice >>> ");
+                                pawnPromote(x, y, player2);
+                            }
+                        }
+                    } else {
+                        capturedPiece = null;
+                        playerPiece.movePiece(new Square(x, y));
                         hasCastled = false;
+                        if (playerPiece instanceof King) {
+                            if (turnCounter % 2 == 0 && x == 7 && y == 6) {
+                                player1.getPlayerPiece(new Square(7, 7)).movePiece(new Square(7, 5));
+                                ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = true;
+                                hasCastled = true;
+                            }
+                            if (turnCounter % 2 == 0 && x == 7 && y == 2) {
+                                player1.getPlayerPiece(new Square(7, 0)).movePiece(new Square(7, 3));
+                                ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = true;
+                                hasCastled = true;
+                            }
+                            if (turnCounter % 2 == 1 && x == 0 && y == 6) {
+                                player2.getPlayerPiece(new Square(0, 7)).movePiece(new Square(0, 5));
+                                ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = true;
+                                hasCastled = true;
+                            }
+                            if (turnCounter % 2 == 1 && x == 0 && y == 2) {
+                                player2.getPlayerPiece(new Square(0, 0)).movePiece(new Square(0, 3));
+                                ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = true;
+                                hasCastled = true;
+                            }
+                            ((King) playerPiece).hasMoved = true;
+                        }
+                        if (playerPiece instanceof Rook) ((Rook) playerPiece).hasMoved = true;
                         if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
                             System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                     "to promote to rook" +
@@ -179,10 +231,6 @@ public class Play {
                                     "\n\nEnter your choice >>> ");
                             pawnPromote(x, y, player1);
                         }
-                    } else {
-                        capturedPiece = player1.getPlayerPiece(new Square(x, y));
-                        player1.capturePiece(capturedPiece);
-                        hasCastled = false;
                         if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
                             System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                     "to promote to rook" +
@@ -194,56 +242,8 @@ public class Play {
                             pawnPromote(x, y, player2);
                         }
                     }
-                } else {
-                    capturedPiece = null;
-                    playerPiece.movePiece(new Square(x, y));
-                    hasCastled = false;
-                    if(playerPiece instanceof King) {
-                        if(turnCounter % 2 == 0 && x == 7 && y == 6) {
-                            player1.getPlayerPiece(new Square(7,7)).movePiece(new Square(7,5));
-                            ((Rook)player1.getPlayerPiece(new Square(7,5))).hasMoved = true;
-                            hasCastled = true;
-                        }
-                        if(turnCounter % 2 == 0 && x == 7 && y == 2) {
-                            player1.getPlayerPiece(new Square(7,0)).movePiece(new Square(7,3));
-                            ((Rook)player1.getPlayerPiece(new Square(7,3))).hasMoved = true;
-                            hasCastled = true;
-                        }
-                        if(turnCounter % 2 == 1 && x == 0 && y == 6) {
-                            player2.getPlayerPiece(new Square(0,7)).movePiece(new Square(0,5));
-                            ((Rook)player2.getPlayerPiece(new Square(0,5))).hasMoved = true;
-                            hasCastled = true;
-                        }
-                        if(turnCounter % 2 == 1 && x == 0 && y == 2) {
-                            player2.getPlayerPiece(new Square(0,0)).movePiece(new Square(0,3));
-                            ((Rook)player2.getPlayerPiece(new Square(0,3))).hasMoved = true;
-                            hasCastled = true;
-                        }
-                        ((King)playerPiece).hasMoved = true;
-                    }
-                    if(playerPiece instanceof Rook) ((Rook)playerPiece).hasMoved = true;
-                    if(playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
-                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                "to promote to rook" +
-                                "\n\n1)Rook" +
-                                "\n2)Knight" +
-                                "\n3)Bishop" +
-                                "\n4)Queen" +
-                                "\n\nEnter your choice >>> ");
-                        pawnPromote(x, y, player1);
-                    }
-                    if(playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
-                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                "to promote to rook" +
-                                "\n\n1)Rook" +
-                                "\n2)Knight" +
-                                "\n3)Bishop" +
-                                "\n4)Queen" +
-                                "\n\nEnter your choice >>> ");
-                        pawnPromote(x, y, player2);
-                    }
+                    turnCounter++;
                 }
-                turnCounter++;
             }
         }
         if ((turnCounter % 2 == 0 && player1.getKing().isInCheck())
