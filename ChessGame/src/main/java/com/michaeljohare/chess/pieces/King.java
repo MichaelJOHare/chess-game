@@ -171,8 +171,8 @@ public class King extends ChessPiece {
                 && (board[x - 1][y + 2].startsWith(KNIGHT))) {
             return true;
         }
-        if ((x < 6 && y > 0 && !player.getPlayer().equals(board[x + 1][y - 1].substring(1)))
-                && (board[x + 1][y - 1].startsWith(KNIGHT))) {
+        if ((x < 6 && y > 0 && !player.getPlayer().equals(board[x + 2][y - 1].substring(1)))
+                && (board[x + 2][y - 1].startsWith(KNIGHT))) {
             return true;
         }
         if ((x < 6 && y < 7 && !player.getPlayer().equals(board[x + 2][y + 1].substring(1)))
@@ -200,19 +200,19 @@ public class King extends ChessPiece {
 
         // Directly diagonal (Pawn) Checker
         if (player.getPlayer().equals(PLAYER_1)) {
-            if ((x > 0 && y > 0 && !player.getPlayer().equals(board[x-1][y-1].substring(1)))
-                    && (board[x-1][y-1].startsWith(PAWN))) {
+            if ((x > 0 && y > 0 && !player.getPlayer().equals(board[x - 1][y - 1].substring(1)))
+                    && (board[x - 1][y - 1].startsWith(PAWN))) {
                 return true;
             }
-            return ((x > 0 && y < 7 && !player.getPlayer().equals(board[x-1][y-1].substring(1)))
-                    && (board[x-1][y-1].startsWith(PAWN)));
+            return ((x > 0 && y < 7 && !player.getPlayer().equals(board[x - 1][y - 1].substring(1)))
+                    && (board[x - 1][y - 1].startsWith(PAWN)));
         } else {
             if ((x < 7 && y > 0 && !player.getPlayer().equals(board[x+1][y-1].substring(1)))
-                    && (board[x+1][y-1].startsWith(PAWN))) {
+                    && (board[x + 1][y - 1].startsWith(PAWN))) {
                 return true;
             }
             return ((x < 7 && y < 7 && !player.getPlayer().equals(board[x+1][y-1].substring(1)))
-                    && (board[x+1][y-1].startsWith(PAWN)));
+                    && (board[x + 1][y - 1].startsWith(PAWN)));
         }
 
     }
