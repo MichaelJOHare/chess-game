@@ -95,6 +95,7 @@ public class Play {
                 turnCounter++;
             }
             turnCounter--;
+            playerPiece = previousPiece;
             play();
         }
 
@@ -117,10 +118,12 @@ public class Play {
             try {
                 if (isEmpty(x, y)) {
                     System.out.println("\nThere is not a selectable piece in the square you chose");
+                    playerPiece = previousPiece;
                     play();
                 }
             } catch (Exception e) {
                 System.out.println("\nInvalid selection, try again.");
+                playerPiece = previousPiece;
                 play();
             }
         }
@@ -134,6 +137,8 @@ public class Play {
 
             if (playerPiece == null) {
                 System.out.println("\nYou must choose your own piece\n");
+                playerPiece = previousPiece;
+                play();
             } else {
                 List<Square> moves = playerPiece.getMoves();
                 if (moves.size() == 0) {
@@ -160,6 +165,7 @@ public class Play {
                     }
                 } catch (Exception e) {
                     System.out.println("Square selection was not a valid input, try again.");
+                    playerPiece = previousPiece;
                     play();
                 }
 
@@ -248,6 +254,7 @@ public class Play {
                     turnCounter++;
                 } else {
                     System.out.println("Invalid square selection.");
+                    playerPiece = previousPiece;
                 }
             }
         }
