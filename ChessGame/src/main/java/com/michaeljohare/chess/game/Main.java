@@ -1,5 +1,8 @@
 package com.michaeljohare.chess.game;
 
+/**
+ * TO DO: JPANEL???
+ */
 
 public class Main {
 

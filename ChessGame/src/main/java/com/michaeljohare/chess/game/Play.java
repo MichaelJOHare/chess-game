@@ -16,6 +16,7 @@ public class Play {
     private Player player2 = new Player(PLAYER_2);
     private ChessPiece capturedPiece;
     private ChessPiece playerPiece;
+    private ChessPiece previousPiece;
     private Scanner userInput = new Scanner(System.in);
 
     public int getTurnCounter() {
@@ -137,6 +138,7 @@ public class Play {
                 List<Square> moves = playerPiece.getMoves();
                 if (moves.size() == 0) {
                     System.out.println("\nThe piece you selected does not have any legal moves");
+                    playerPiece = previousPiece;
                     play();
                 }
                 System.out.println("\nThese are the available moves");
@@ -242,7 +244,10 @@ public class Play {
                             pawnPromote(x, y, player2);
                         }
                     }
+                    previousPiece = playerPiece;
                     turnCounter++;
+                } else {
+                    System.out.println("Invalid square selection.");
                 }
             }
         }
