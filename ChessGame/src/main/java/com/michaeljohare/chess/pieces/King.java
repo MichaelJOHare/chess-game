@@ -409,4 +409,14 @@ public class King extends ChessPiece {
     public String getChessPieceConstant() {
         return KING;
     }
+
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_KING;
+    }
+
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_KING;
+    }
 }

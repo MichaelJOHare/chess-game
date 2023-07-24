@@ -110,4 +110,14 @@ public class Rook extends ChessPiece {
     public String getChessPieceConstant() {
         return ROOK;
     }
+
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_ROOK;
+    }
+
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_ROOK;
+    }
 }
