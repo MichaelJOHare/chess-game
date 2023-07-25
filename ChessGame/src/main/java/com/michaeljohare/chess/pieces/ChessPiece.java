@@ -22,6 +22,8 @@ public abstract class ChessPiece {
 
     public abstract List<Square> getMoves();
     public abstract String getChessPieceConstant();
+    public abstract String getWhiteChessPieceSymbol();
+    public abstract String getBlackChessPieceSymbol();
 
     public void movePiece(Square end) {
         board[end.getX()][end.getY()] = getChessPieceConstant() + player.getPlayer();

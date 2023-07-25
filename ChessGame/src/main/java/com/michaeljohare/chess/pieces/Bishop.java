@@ -111,4 +111,14 @@ public class Bishop extends ChessPiece {
     public String getChessPieceConstant() {
         return BISHOP;
     }
+
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_BISHOP;
+    }
+
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_BISHOP;
+    }
 }

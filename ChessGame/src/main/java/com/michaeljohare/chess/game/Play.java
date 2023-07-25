@@ -11,7 +11,6 @@ public class Play {
 
     private int turnCounter;
     private boolean hasCastled = false;
-
     private Player player1 = new Player(PLAYER_1);
     private Player player2 = new Player(PLAYER_2);
     private ChessPiece capturedPiece;

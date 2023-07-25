@@ -30,6 +30,16 @@ public class Queen extends ChessPiece {
         return QUEEN;
     }
 
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_QUEEN;
+    }
+
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_QUEEN;
+    }
+
     private List<Square> getBishopMoves() {
         List<Square> availableMoves = new ArrayList<>();
         int x = currentSquare.getX(), y = currentSquare.getY();

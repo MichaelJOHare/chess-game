@@ -96,5 +96,13 @@ public class Pawn extends ChessPiece {
         return PAWN;
     }
 
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_PAWN;
+    }
 
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_PAWN;
+    }
 }

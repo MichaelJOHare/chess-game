@@ -155,4 +155,14 @@ public class Knight extends ChessPiece {
     public String getChessPieceConstant() {
         return KNIGHT;
     }
+
+    @Override
+    public String getWhiteChessPieceSymbol() {
+        return WHITE_KNIGHT;
+    }
+
+    @Override
+    public String getBlackChessPieceSymbol() {
+        return BLACK_KNIGHT;
+    }
 }

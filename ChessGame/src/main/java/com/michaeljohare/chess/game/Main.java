@@ -1,16 +1,15 @@
 package com.michaeljohare.chess.game;
 
-/**
- * TO DO: JPANEL???
- */
+import com.michaeljohare.chess.GUI.ChessGUI;
 
 public class Main {
 
     public static void main(String[] args) {
         Board.initializeBoard();
-        Play play = new Play();
+        ChessGUI chessGUI = new ChessGUI();
 
-        while (true) {
+        // Play play = new Play();
+/*        while (true) {
             play.play();
             if (!hasWon(play)) {
                 Board.displayBoard();
@@ -21,7 +20,7 @@ public class Main {
                     break;
                 }
             }
-        }
+        }*/
     }
 
     private static boolean hasWon(Play play) {
