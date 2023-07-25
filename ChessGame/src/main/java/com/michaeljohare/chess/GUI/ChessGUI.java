@@ -25,6 +25,7 @@ public class ChessGUI extends JFrame {
 
     private JButton[][] chessButtons;
     private JButton undoButton;
+    private JButton playAgainButton;
     private JTextArea logTextArea;
     private final String lineBreaks = "\n\n\n\n\n\n\n";
     private JScrollPane logScrollPane;
@@ -50,7 +51,8 @@ public class ChessGUI extends JFrame {
 
     private void initializeGUI() {
         JFrame frame = new JFrame("Chess");
-        frame.setSize(1100, 1000);
+        updateFrame(frame);
+        frame.setSize(1150, 1000);
         frame.setLayout(new BorderLayout());
 
         JPanel chessboardPanel = createChessboardPanel();
@@ -104,6 +106,15 @@ public class ChessGUI extends JFrame {
         return chessboardPanel;
     }
 
+    private void updateFrame(JFrame frame) {
+        try {
+            Image frameIcon = ImageIO.read(ChessGUI.class.getResource("/Frame_Icon.png"));
+            frame.setIconImage(frameIcon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private JTextArea createLogTextArea() {
         JTextArea logTextArea = new JTextArea(5, 20);
         logTextArea.setLineWrap(true);
@@ -131,20 +142,30 @@ public class ChessGUI extends JFrame {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
 
-        JPanel logPanelWithUndo = new JPanel(new BorderLayout());
+        playAgainButton = new JButton("Play Again");
+        playAgainButton.setBackground(Color.BLACK);
+        playAgainButton.setForeground(Color.WHITE);
+        playAgainButton.setFont(new Font("Roboto", Font.BOLD, 24));
+
         undoButton = new JButton("Undo");
         undoButton.setBackground(Color.BLACK);
         undoButton.setForeground(Color.WHITE);
         undoButton.setFont(new Font("Roboto", Font.BOLD, 24));
         undoButton.addActionListener(e -> onUndoButtonClick());
 
+        JPanel playAgainButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        playAgainButtonPanel.add(playAgainButton);
+
         JPanel undoButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         undoButtonPanel.add(undoButton);
-        logPanelWithUndo.add(logScrollPane, BorderLayout.CENTER);
-        logPanelWithUndo.add(undoButtonPanel, BorderLayout.SOUTH);
+
+        JPanel logPanelWithButtons = new JPanel(new BorderLayout());
+        logPanelWithButtons.add(logScrollPane, BorderLayout.CENTER);
+        logPanelWithButtons.add(playAgainButtonPanel, BorderLayout.NORTH);
+        logPanelWithButtons.add(undoButtonPanel, BorderLayout.SOUTH);
 
         rightPanel.add(player1CapturedArea, BorderLayout.SOUTH);
-        rightPanel.add(logPanelWithUndo, BorderLayout.CENTER);
+        rightPanel.add(logPanelWithButtons, BorderLayout.CENTER);
         rightPanel.add(player2CapturedArea, BorderLayout.NORTH);
 
         return rightPanel;
