@@ -3,7 +3,6 @@ package com.michaeljohare.chess.GUI;
 import com.michaeljohare.chess.game.Player;
 import com.michaeljohare.chess.game.Square;
 import com.michaeljohare.chess.pieces.*;
-import com.sun.jdi.BooleanType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,6 +26,7 @@ public class ChessGUI extends JFrame {
 
     private JButton[][] chessButtons;
     private JTextArea logTextArea;
+    private JScrollPane logScrollPane;
     private JTextArea player1CapturedArea;
     private JTextArea player2CapturedArea;
     private int turnCounter;
@@ -47,6 +47,89 @@ public class ChessGUI extends JFrame {
     }
 
     private void initializeGUI() {
+        JFrame frame = new JFrame("Chess");
+        frame.setSize(1100, 1000);
+        frame.setLayout(new BorderLayout());
+
+        JPanel chessboardPanel = createChessboardPanel();
+
+        logTextArea = createLogTextArea();
+        logScrollPane = new JScrollPane(logTextArea);
+
+        player1CapturedArea = createCapturedArea();
+        player2CapturedArea = createCapturedArea();
+
+        JPanel rightPanel = createRightPanel();
+
+        frame.add(chessboardPanel, BorderLayout.CENTER);
+        frame.add(rightPanel, BorderLayout.EAST);
+
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        updateGUI();
+    }
+
+    private JPanel createChessboardPanel() {
+        JPanel chessboardPanel = new JPanel(new GridLayout(8, 8));
+        chessButtons = new JButton[8][8];
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                chessButtons[row][col] = new JButton();
+                chessButtons[row][col].setFont(new Font("Roboto", Font.PLAIN, 40));
+                if (row % 2 == 0) {
+                    if (col % 2 == 0) {
+                        chessButtons[row][col].setBackground(new Color(248, 240, 198));
+                    } else {
+                        chessButtons[row][col].setBackground(new Color(156, 98, 69));
+                    }
+                } else {
+                    if (col % 2 == 1) {
+                        chessButtons[row][col].setBackground(new Color(248, 240, 198));
+                    } else {
+                        chessButtons[row][col].setBackground(new Color(156, 98, 69));
+                    }
+                }
+                updateButton(row, col);
+                final int finalRow = row;
+                final int finalCol = col;
+                chessButtons[row][col].addActionListener(e -> onSquareClick(finalRow, finalCol));
+                chessboardPanel.add(chessButtons[row][col]);
+            }
+        }
+        return chessboardPanel;
+    }
+
+    private JTextArea createLogTextArea() {
+        JTextArea logTextArea = new JTextArea(5, 20);
+        logTextArea.setLineWrap(true);
+        logTextArea.setWrapStyleWord(true);
+        logTextArea.setEditable(false);
+        return logTextArea;
+    }
+
+    private JTextArea createCapturedArea() {
+        JTextArea capturedArea = new JTextArea(15, 8);
+        JLabel capturedPiecesTitle = new JLabel("Captured Pieces");
+        capturedPiecesTitle.setFont(new Font("Roboto", Font.BOLD, 24));
+        capturedArea.add(capturedPiecesTitle);
+        capturedArea.setEditable(false);
+        capturedArea.setLayout(new FlowLayout());
+        capturedArea.setLineWrap(true);
+        capturedArea.setWrapStyleWord(true);
+        capturedArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        return capturedArea;
+    }
+
+    private JPanel createRightPanel() {
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+        rightPanel.add(player1CapturedArea, BorderLayout.SOUTH);
+        rightPanel.add(logScrollPane, BorderLayout.CENTER);
+        rightPanel.add(player2CapturedArea, BorderLayout.NORTH);
+        return rightPanel;
+    }
+
+/*    private void initializeGUI() {
         JFrame frame = new JFrame("Chess");
         frame.setSize(1100, 1000);
         frame.setLayout(new BorderLayout());
@@ -109,7 +192,7 @@ public class ChessGUI extends JFrame {
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         updateGUI();
-    }
+    }*/
 
     private void updateButton(int row, int col) {
         String pieceType = getPieceType(board[row][col]);
