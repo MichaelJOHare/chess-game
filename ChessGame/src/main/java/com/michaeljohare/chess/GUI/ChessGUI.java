@@ -18,15 +18,17 @@ public class ChessGUI extends JFrame {
 
     /*TO DO:
     * Implement pawn promote
-    * Implement undo
     * Implement check/checkmate
-    * Implement message display
     * A-H 1-8 Legend
+    * fix capturedPiecesTitle disappearing after piece capture
     * */
 
     private JButton[][] chessButtons;
+    private JButton undoButton;
     private JTextArea logTextArea;
+    private final String lineBreaks = "\n\n\n\n\n\n\n";
     private JScrollPane logScrollPane;
+    private JLabel capturedPiecesTitle;
     private JTextArea player1CapturedArea;
     private JTextArea player2CapturedArea;
     private int turnCounter;
@@ -54,6 +56,9 @@ public class ChessGUI extends JFrame {
         JPanel chessboardPanel = createChessboardPanel();
 
         logTextArea = createLogTextArea();
+        logTextArea.setFont(new Font("Roboto", Font.PLAIN, 20));
+        logTextArea.setText("\n\n\n Welcome to Michael's Chess Game! \n Use the undo button to undo a \n previous move. " +
+                "\n\n It is White's turn to move first.");
         logScrollPane = new JScrollPane(logTextArea);
 
         player1CapturedArea = createCapturedArea();
@@ -109,23 +114,39 @@ public class ChessGUI extends JFrame {
 
     private JTextArea createCapturedArea() {
         JTextArea capturedArea = new JTextArea(15, 8);
-        JLabel capturedPiecesTitle = new JLabel("Captured Pieces");
+        capturedPiecesTitle = new JLabel("Captured Pieces");
         capturedPiecesTitle.setFont(new Font("Roboto", Font.BOLD, 24));
+
         capturedArea.add(capturedPiecesTitle);
         capturedArea.setEditable(false);
         capturedArea.setLayout(new FlowLayout());
         capturedArea.setLineWrap(true);
         capturedArea.setWrapStyleWord(true);
         capturedArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
         return capturedArea;
     }
 
     private JPanel createRightPanel() {
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
+
+        JPanel logPanelWithUndo = new JPanel(new BorderLayout());
+        undoButton = new JButton("Undo");
+        undoButton.setBackground(Color.BLACK);
+        undoButton.setForeground(Color.WHITE);
+        undoButton.setFont(new Font("Roboto", Font.BOLD, 24));
+        undoButton.addActionListener(e -> onUndoButtonClick());
+
+        JPanel undoButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        undoButtonPanel.add(undoButton);
+        logPanelWithUndo.add(logScrollPane, BorderLayout.CENTER);
+        logPanelWithUndo.add(undoButtonPanel, BorderLayout.SOUTH);
+
         rightPanel.add(player1CapturedArea, BorderLayout.SOUTH);
-        rightPanel.add(logScrollPane, BorderLayout.CENTER);
+        rightPanel.add(logPanelWithUndo, BorderLayout.CENTER);
         rightPanel.add(player2CapturedArea, BorderLayout.NORTH);
+
         return rightPanel;
     }
 
@@ -187,12 +208,12 @@ public class ChessGUI extends JFrame {
             }
 
             if (playerPiece == null) {
-                System.out.println("No piece in square");
+                logTextArea.setText(lineBreaks + " There's no piece available in the selected square");
             } else {
                 sourceSquare = new Square(row, col);
                 List<Square> moves = playerPiece.getMoves();
                 if (moves.size() == 0) {
-                    System.out.println("\nThe piece you selected does not have any legal moves");
+                    System.out.println(lineBreaks + " The piece you selected does not have any legal moves");
                     playerPiece = null;
                     isFirstClick = true;
                 }else {
@@ -297,57 +318,66 @@ public class ChessGUI extends JFrame {
                 sourceSquare = null;
                 isFirstClick = true;
                 turnCounter++;
+                logTextArea.removeAll();
+                if (turnCounter % 2 == 0) {
+                    logTextArea.setText(lineBreaks + " It's the white player's turn to move.");
+                } else if (turnCounter % 2 == 1) {
+                    logTextArea.setText(lineBreaks+ " It's the black player's turn to move.");
+                }
             } else {
-                System.out.println("The square you chose to move to is not a legal move, choose a piece and try again.");
+                logTextArea.setText(lineBreaks + " The square you chose to move to is not a legal move, choose a " +
+                        "piece and try again.");
                 clearHighlightedSquares();
                 playerPiece = null;
                 sourceSquare = null;
                 isFirstClick = true;
             }
         }
-        // UNDO logic
-/*        try {
-            if (capturedPiece != null) {
-                if (turnCounter % 2 == 0) {
-                    playerPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player1.getPlayer());
-                    player1.undoCapturePiece(capturedPiece);
-                } else {
-                    playerPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player2.getPlayer());
-                    player2.undoCapturePiece(capturedPiece);
-                }
-            } else {
-                playerPiece.undoMovePiece(EMPTY);
-                if (playerPiece instanceof King) ((King) playerPiece).hasMoved = false;
-                if (playerPiece instanceof Rook) ((Rook) playerPiece).hasMoved = false;
-                if (hasCastled) {
-                    if (turnCounter % 2 == 1) {
-                        if (board[7][5].equals(ROOK + PLAYER_1)) {
-                            ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = false;
-                            player1.getPlayerPiece(new Square(7, 5)).undoMovePiece(EMPTY);
-                        } else if (board[7][3].equals(ROOK + PLAYER_1)) {
-                            ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = false;
-                            player1.getPlayerPiece(new Square(7, 3)).undoMovePiece(EMPTY);
-                        }
+    }
+
+    private void onUndoButtonClick() {
+        if (turnCounter > 0) {
+            try {
+                if (capturedPiece != null) {
+                    if (turnCounter % 2 == 0) {
+                        previousPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player1.getPlayer());
+                        player1.undoCapturePiece(capturedPiece);
                     } else {
-                        if (board[0][5].equals(ROOK + PLAYER_2)) {
-                            ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = false;
-                            player2.getPlayerPiece(new Square(0, 5)).undoMovePiece(EMPTY);
-                        } else if (board[0][3].equals(ROOK + PLAYER_2)) {
-                            ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = false;
-                            player2.getPlayerPiece(new Square(0, 3)).undoMovePiece(EMPTY);
+                        previousPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player2.getPlayer());
+                        player2.undoCapturePiece(capturedPiece);
+                    }
+                } else {
+                    previousPiece.undoMovePiece(EMPTY);
+                    if (playerPiece instanceof King) ((King) previousPiece).hasMoved = false;
+                    if (playerPiece instanceof Rook) ((Rook) previousPiece).hasMoved = false;
+                    if (hasCastled) {
+                        if (turnCounter % 2 == 1) {
+                            if (board[7][5].equals(ROOK + PLAYER_1)) {
+                                ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = false;
+                                player1.getPlayerPiece(new Square(7, 5)).undoMovePiece(EMPTY);
+                            } else if (board[7][3].equals(ROOK + PLAYER_1)) {
+                                ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = false;
+                                player1.getPlayerPiece(new Square(7, 3)).undoMovePiece(EMPTY);
+                            }
+                        } else {
+                            if (board[0][5].equals(ROOK + PLAYER_2)) {
+                                ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = false;
+                                player2.getPlayerPiece(new Square(0, 5)).undoMovePiece(EMPTY);
+                            } else if (board[0][3].equals(ROOK + PLAYER_2)) {
+                                ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = false;
+                                player2.getPlayerPiece(new Square(0, 3)).undoMovePiece(EMPTY);
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                logTextArea.setText(lineBreaks + " You can only undo a previous move \n one time!");
+                turnCounter++;
             }
-        } catch (Exception e) {
-            System.out.println("\n\nYou can only undo a previous move one time\n");
-            turnCounter++;
+            updateGUI();
+            turnCounter--;
+            playerPiece = previousPiece;
         }
-        turnCounter--;
-        playerPiece = previousPiece;
-        */
-
-
     }
 
 
@@ -362,6 +392,8 @@ public class ChessGUI extends JFrame {
     private void updateCapturedPiecesDisplay() {
         player1CapturedArea.removeAll();
         player2CapturedArea.removeAll();
+        player1CapturedArea.add(capturedPiecesTitle);
+        player2CapturedArea.add(capturedPiecesTitle);
 
         for (ChessPiece piece : player1CapturedPieces) {
             JLabel blackCapturedPieceLabel = new JLabel(piece.getBlackChessPieceSymbol());
