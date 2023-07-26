@@ -1,7 +1,6 @@
 package com.michaeljohare.chess.game;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.michaeljohare.chess.GUI.ChessGUI;
 
 import javax.swing.*;

@@ -126,7 +126,7 @@ public class King extends ChessPiece {
 
 
 
-        // 1 square padded box (Opponent King) Checker
+        // 1 square padded box (Opponent King) Checker although never should occur, mainly for checking bugs
         if ((x < 7 && y < 7 && !player.getPlayer().equals(board[x + 1][y + 1].substring(1)))
            && (board[x + 1][y + 1].startsWith(KING))) {
             return true;
@@ -204,15 +204,15 @@ public class King extends ChessPiece {
                     && (board[x - 1][y - 1].startsWith(PAWN))) {
                 return true;
             }
-            return ((x > 0 && y < 7 && !player.getPlayer().equals(board[x - 1][y - 1].substring(1)))
-                    && (board[x - 1][y - 1].startsWith(PAWN)));
+            return ((x > 0 && y < 7 && !player.getPlayer().equals(board[x - 1][y + 1].substring(1)))
+                    && (board[x - 1][y + 1].startsWith(PAWN)));
         } else {
-            if ((x < 7 && y > 0 && !player.getPlayer().equals(board[x+1][y-1].substring(1)))
+            if ((x < 7 && y > 0 && !player.getPlayer().equals(board[x + 1][y - 1].substring(1)))
                     && (board[x + 1][y - 1].startsWith(PAWN))) {
                 return true;
             }
-            return ((x < 7 && y < 7 && !player.getPlayer().equals(board[x+1][y-1].substring(1)))
-                    && (board[x + 1][y - 1].startsWith(PAWN)));
+            return ((x < 7 && y < 7 && !player.getPlayer().equals(board[x + 1][y + 1].substring(1)))
+                    && (board[x + 1][y + 1].startsWith(PAWN)));
         }
 
     }
@@ -243,6 +243,7 @@ public class King extends ChessPiece {
                 availableMoves.add(new Square(x, y + 1));
             }
             undoMovePiece(EMPTY);
+
             if(player.getPlayer().equals(PLAYER_1)) {
                 if (!player.getKing().isInCheck() && y < 6 && isEmpty(x, y+2) &&
                         currentSquare.equals(new Square(7, 4)) && !hasMoved && board[7][7].equals(ROOK + PLAYER_1)) {
@@ -259,7 +260,7 @@ public class King extends ChessPiece {
                 }
             }
             else if(!player.getKing().isInCheck() && y < 6 && isEmpty(x, y+2) &&
-                    currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][7].equals(ROOK + PLAYER_1)) {
+                    currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][7].equals(ROOK + PLAYER_2)) {
                 Rook rook = (Rook)player.getPlayerPiece(new Square(0,7));
                 if(rook.isAbleToCastle()) {
                     movePiece(new Square(0, 6));
@@ -272,12 +273,14 @@ public class King extends ChessPiece {
                 rook.undoMovePiece(EMPTY);
             }
         }
+
         if (y > 0 && isEmpty(x, y - 1)) {
             movePiece(new Square(x, y - 1));
             if (!player.getKing().isInCheck()) {
                 availableMoves.add(new Square(x, y - 1));
             }
             undoMovePiece(EMPTY);
+
             if(player.getPlayer().equals(PLAYER_1)) {
                 if (!player.getKing().isInCheck() && y>1 &&isEmpty(x, y-2) &&
                         currentSquare.equals(new Square(7, 4)) && !hasMoved && board[7][0].equals(ROOK + PLAYER_1)) {
@@ -294,7 +297,7 @@ public class King extends ChessPiece {
                 }
             }
             else if(!player.getKing().isInCheck() && y>1 && isEmpty(x, y-2) && 
-                    currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][0].equals(ROOK + PLAYER_1)) {
+                    currentSquare.equals(new Square(0, 4)) && !hasMoved && board[0][0].equals(ROOK + PLAYER_2)) {
                 Rook rook = (Rook)player.getPlayerPiece(new Square(0,0));
                 if(rook.isAbleToCastle()) {
                     movePiece(new Square(0, 2));

@@ -20,6 +20,7 @@ public class ChessGUI extends JFrame {
 
     /*TO DO:
     * A-H 1-8 Legend
+    * Captured pieces font color
     * */
 
     private JButton[][] chessButtons;
@@ -35,7 +36,8 @@ public class ChessGUI extends JFrame {
     private final List<ChessPiece> player2CapturedPieces = new ArrayList<>();
     private final List<Square> highlightedSquares = new ArrayList<>();
     private int turnCounter;
-    private boolean hasCastled = false;
+    private boolean player1HasCastled = false;
+    private boolean player2HasCastled = false;
     private boolean isFirstClick = true;
     private boolean pawnPromotionFlag = false;
     private ChessPiece playerPiece;
@@ -50,7 +52,7 @@ public class ChessGUI extends JFrame {
     private void initializeGUI() {
         JFrame frame = new JFrame("Chess");
         updateFrame(frame);
-        frame.setSize(1150, 1000);
+        frame.setSize(1200, 1000);
         frame.setLayout(new BorderLayout());
 
         JPanel chessboardPanel = createChessboardPanel();
@@ -255,13 +257,11 @@ public class ChessGUI extends JFrame {
                         player2.capturePiece(capturedPiece);
                         player1CapturedPieces.add(capturedPiece);
                         updateCapturedPiecesDisplay();
-                        hasCastled = false;
                     } else {
                         capturedPiece = player1.getPlayerPiece(new Square(row, col));
                         player1.capturePiece(capturedPiece);
                         player2CapturedPieces.add(capturedPiece);
                         updateCapturedPiecesDisplay();
-                        hasCastled = false;
                     }
 
                     if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0 ||
@@ -273,28 +273,27 @@ public class ChessGUI extends JFrame {
 
                     capturedPiece = null;
                     playerPiece.movePiece(new Square(row, col));
-                    hasCastled = false;
 
                     if (playerPiece instanceof King) {
                         if (turnCounter % 2 == 0 && row == 7 && col == 6) {
                             player1.getPlayerPiece(new Square(7, 7)).movePiece(new Square(7, 5));
                             ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = true;
-                            hasCastled = true;
+                            player1HasCastled = true;
                         }
                         if (turnCounter % 2 == 0 && row == 7 && col == 2) {
                             player1.getPlayerPiece(new Square(7, 0)).movePiece(new Square(7, 3));
                             ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = true;
-                            hasCastled = true;
+                            player1HasCastled = true;
                         }
                         if (turnCounter % 2 == 1 && row == 0 && col == 6) {
                             player2.getPlayerPiece(new Square(0, 7)).movePiece(new Square(0, 5));
                             ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = true;
-                            hasCastled = true;
+                            player2HasCastled = true;
                         }
                         if (turnCounter % 2 == 1 && row == 0 && col == 2) {
                             player2.getPlayerPiece(new Square(0, 0)).movePiece(new Square(0, 3));
                             ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = true;
-                            hasCastled = true;
+                            player2HasCastled = true;
                         }
                         ((King) playerPiece).hasMoved = true;
                     }
@@ -351,23 +350,21 @@ public class ChessGUI extends JFrame {
                     previousPiece.undoMovePiece(EMPTY);
                     if (playerPiece instanceof King) ((King) previousPiece).hasMoved = false;
                     if (playerPiece instanceof Rook) ((Rook) previousPiece).hasMoved = false;
-                    if (hasCastled) {
-                        if (turnCounter % 2 == 1) {
-                            if (board[7][5].equals(ROOK + PLAYER_1)) {
-                                ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = false;
-                                player1.getPlayerPiece(new Square(7, 5)).undoMovePiece(EMPTY);
-                            } else if (board[7][3].equals(ROOK + PLAYER_1)) {
-                                ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = false;
-                                player1.getPlayerPiece(new Square(7, 3)).undoMovePiece(EMPTY);
-                            }
-                        } else {
-                            if (board[0][5].equals(ROOK + PLAYER_2)) {
-                                ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = false;
-                                player2.getPlayerPiece(new Square(0, 5)).undoMovePiece(EMPTY);
-                            } else if (board[0][3].equals(ROOK + PLAYER_2)) {
-                                ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = false;
-                                player2.getPlayerPiece(new Square(0, 3)).undoMovePiece(EMPTY);
-                            }
+                    if (turnCounter % 2 == 1 && player1HasCastled) {
+                        if (board[7][5].equals(ROOK + PLAYER_1)) {
+                            ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = false;
+                            player1.getPlayerPiece(new Square(7, 5)).undoMovePiece(EMPTY);
+                        } else if (board[7][3].equals(ROOK + PLAYER_1)) {
+                            ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = false;
+                            player1.getPlayerPiece(new Square(7, 3)).undoMovePiece(EMPTY);
+                        }
+                    } else if (turnCounter % 2 == 0 && player2HasCastled){
+                        if (board[0][5].equals(ROOK + PLAYER_2)) {
+                            ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = false;
+                            player2.getPlayerPiece(new Square(0, 5)).undoMovePiece(EMPTY);
+                        } else if (board[0][3].equals(ROOK + PLAYER_2)) {
+                            ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = false;
+                            player2.getPlayerPiece(new Square(0, 3)).undoMovePiece(EMPTY);
                         }
                     }
                 }
@@ -395,7 +392,8 @@ public class ChessGUI extends JFrame {
         player2CapturedPieces.clear();
 
         turnCounter = 0;
-        hasCastled = false;
+        player1HasCastled = false;
+        player2HasCastled = false;
         isFirstClick = true;
         capturedPiece = null;
         highlightedSquares.clear();
@@ -463,7 +461,7 @@ public class ChessGUI extends JFrame {
             if (playerPiece instanceof Pawn && (row == 0 || row == 7)) {
                 String[] options = {"Queen", "Rook", "Bishop", "Knight"};
                 int choice = JOptionPane.showOptionDialog(
-                        this,
+                        chessButtons[playerPiece.getCurrentSquare().getX()][playerPiece.getCurrentSquare().getY()],
                         "Select a piece to promote the pawn to:",
                         "Pawn Promotion",
                         JOptionPane.DEFAULT_OPTION,
