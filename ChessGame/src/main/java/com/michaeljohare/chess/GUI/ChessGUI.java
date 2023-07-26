@@ -1,11 +1,13 @@
 package com.michaeljohare.chess.GUI;
 
+import com.michaeljohare.chess.game.Board;
 import com.michaeljohare.chess.game.Player;
 import com.michaeljohare.chess.game.Square;
 import com.michaeljohare.chess.pieces.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,33 +19,29 @@ import static com.michaeljohare.chess.game.Board.board;
 public class ChessGUI extends JFrame {
 
     /*TO DO:
-    * Implement pawn promote
-    * Implement check/checkmate
     * A-H 1-8 Legend
-    * fix capturedPiecesTitle disappearing after piece capture
     * */
 
     private JButton[][] chessButtons;
-    private JButton undoButton;
     private JButton playAgainButton;
+    private Color defaultButtonColor;
     private JTextArea logTextArea;
-    private final String lineBreaks = "\n\n\n\n\n\n\n";
     private JScrollPane logScrollPane;
-    private JLabel capturedPiecesTitle;
     private JTextArea player1CapturedArea;
     private JTextArea player2CapturedArea;
-    private int turnCounter;
-    private boolean hasCastled = false;
     private final Player player1 = new Player(PLAYER_1);
     private final Player player2 = new Player(PLAYER_2);
-    private Square sourceSquare;
+    private final List<ChessPiece> player1CapturedPieces = new ArrayList<>();
+    private final List<ChessPiece> player2CapturedPieces = new ArrayList<>();
+    private final List<Square> highlightedSquares = new ArrayList<>();
+    private int turnCounter;
+    private boolean hasCastled = false;
     private boolean isFirstClick = true;
-    private ChessPiece capturedPiece;
-    private List<ChessPiece> player1CapturedPieces = new ArrayList<>();
-    private List<ChessPiece> player2CapturedPieces = new ArrayList<>();
-    private List<Square> highlightedSquares = new ArrayList<>();
+    private boolean pawnPromotionFlag = false;
     private ChessPiece playerPiece;
+    private ChessPiece capturedPiece;
     private ChessPiece previousPiece;
+    private final String lineBreaks = "\n\n\n\n\n\n";
 
     public ChessGUI() {
         initializeGUI();
@@ -65,6 +63,7 @@ public class ChessGUI extends JFrame {
 
         player1CapturedArea = createCapturedArea();
         player2CapturedArea = createCapturedArea();
+        updateCapturedPiecesDisplay();
 
         JPanel rightPanel = createRightPanel();
 
@@ -82,7 +81,6 @@ public class ChessGUI extends JFrame {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 chessButtons[row][col] = new JButton();
-                chessButtons[row][col].setFont(new Font("Roboto", Font.PLAIN, 40));
                 if (row % 2 == 0) {
                     if (col % 2 == 0) {
                         chessButtons[row][col].setBackground(new Color(248, 240, 198));
@@ -125,15 +123,11 @@ public class ChessGUI extends JFrame {
 
     private JTextArea createCapturedArea() {
         JTextArea capturedArea = new JTextArea(15, 8);
-        capturedPiecesTitle = new JLabel("Captured Pieces");
-        capturedPiecesTitle.setFont(new Font("Roboto", Font.BOLD, 24));
 
-        capturedArea.add(capturedPiecesTitle);
         capturedArea.setEditable(false);
         capturedArea.setLayout(new FlowLayout());
         capturedArea.setLineWrap(true);
         capturedArea.setWrapStyleWord(true);
-        capturedArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         return capturedArea;
     }
@@ -143,13 +137,11 @@ public class ChessGUI extends JFrame {
         rightPanel.setLayout(new BorderLayout());
 
         playAgainButton = new JButton("Play Again");
-        playAgainButton.setBackground(Color.BLACK);
-        playAgainButton.setForeground(Color.WHITE);
         playAgainButton.setFont(new Font("Roboto", Font.BOLD, 24));
+        playAgainButton.addActionListener(e -> onPlayAgainButtonClick());
+        defaultButtonColor = playAgainButton.getBackground();
 
-        undoButton = new JButton("Undo");
-        undoButton.setBackground(Color.BLACK);
-        undoButton.setForeground(Color.WHITE);
+        JButton undoButton = new JButton("Undo");
         undoButton.setFont(new Font("Roboto", Font.BOLD, 24));
         undoButton.addActionListener(e -> onUndoButtonClick());
 
@@ -174,6 +166,8 @@ public class ChessGUI extends JFrame {
     private void updateButton(int row, int col) {
         String pieceType = getPieceType(board[row][col]);
         String player = getPlayer(board[row][col]);
+
+        chessButtons[row][col].setBorder(null);
 
         if (!pieceType.equals(EMPTY)) {
             String imagePath = getImagePath(pieceType, player);
@@ -222,6 +216,7 @@ public class ChessGUI extends JFrame {
 
     private void onSquareClick(int row, int col) {
         if (isFirstClick) {
+
             if (turnCounter % 2 == 0) {
                 playerPiece = player1.getPlayerPiece(new Square(row, col));
             } else if (turnCounter % 2 == 1) {
@@ -229,14 +224,17 @@ public class ChessGUI extends JFrame {
             }
 
             if (playerPiece == null) {
-                logTextArea.setText(lineBreaks + " There's no piece available in the selected square");
+                logTextArea.setText(lineBreaks + " There's no piece available in the\n selected square, or the " +
+                        "piece you\n selected is not your piece.");
             } else {
-                sourceSquare = new Square(row, col);
                 List<Square> moves = playerPiece.getMoves();
+
                 if (moves.size() == 0) {
-                    System.out.println(lineBreaks + " The piece you selected does not have any legal moves");
+
+                    logTextArea.setText(lineBreaks + " The piece you selected does not have any legal moves");
                     playerPiece = null;
                     isFirstClick = true;
+
                 }else {
                     for (Square square : moves) {
                         chessButtons[square.getX()][square.getY()].setBorder(BorderFactory.createLineBorder(Color.YELLOW, 4));
@@ -246,47 +244,37 @@ public class ChessGUI extends JFrame {
                 }
             }
         } else {
+
             Square targetSquare = new Square(row, col);
             if (playerPiece.getMoves().contains(targetSquare)) {
                 if (!isEmpty(row, col)) {
                     playerPiece.movePiece(new Square(row, col));
+
                     if (turnCounter % 2 == 0) {
                         capturedPiece = player2.getPlayerPiece(new Square(row, col));
                         player2.capturePiece(capturedPiece);
                         player1CapturedPieces.add(capturedPiece);
                         updateCapturedPiecesDisplay();
                         hasCastled = false;
-/*                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
-                            System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                    "to promote to rook" +
-                                    "\n\n1)Rook" +
-                                    "\n2)Knight" +
-                                    "\n3)Bishop" +
-                                    "\n4)Queen" +
-                                    "\n\nEnter your choice >>> ");
-                            pawnPromote(x, y, player1);
-                        }*/
                     } else {
                         capturedPiece = player1.getPlayerPiece(new Square(row, col));
                         player1.capturePiece(capturedPiece);
                         player2CapturedPieces.add(capturedPiece);
                         updateCapturedPiecesDisplay();
                         hasCastled = false;
-/*                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
-                            System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                    "to promote to rook" +
-                                    "\n\n1)Rook" +
-                                    "\n2)Knight" +
-                                    "\n3)Bishop" +
-                                    "\n4)Queen" +
-                                    "\n\nEnter your choice >>> ");
-                            pawnPromote(x, y, player2);
-                        }*/
                     }
+
+                    if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0 ||
+                            playerPiece.getCurrentSquare().getX() == 7) {
+                        pawnPromotionFlag = true;
+                    }
+
                 } else {
+
                     capturedPiece = null;
                     playerPiece.movePiece(new Square(row, col));
                     hasCastled = false;
+
                     if (playerPiece instanceof King) {
                         if (turnCounter % 2 == 0 && row == 7 && col == 6) {
                             player1.getPlayerPiece(new Square(7, 7)).movePiece(new Square(7, 5));
@@ -310,47 +298,37 @@ public class ChessGUI extends JFrame {
                         }
                         ((King) playerPiece).hasMoved = true;
                     }
+
                     if (playerPiece instanceof Rook) ((Rook) playerPiece).hasMoved = true;
-/*                    if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
-                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                "to promote to rook" +
-                                "\n\n1)Rook" +
-                                "\n2)Knight" +
-                                "\n3)Bishop" +
-                                "\n4)Queen" +
-                                "\n\nEnter your choice >>> ");
-                        pawnPromote(x, y, player1);
+                    if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0 ||
+                            playerPiece.getCurrentSquare().getX() == 7) {
+                        pawnPromotionFlag = true;
                     }
-                    if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
-                        System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
-                                "to promote to rook" +
-                                "\n\n1)Rook" +
-                                "\n2)Knight" +
-                                "\n3)Bishop" +
-                                "\n4)Queen" +
-                                "\n\nEnter your choice >>> ");
-                        pawnPromote(x, y, player2);
-                    }*/
                 }
+
+                handlePawnPromotion(row);
+
                 updateGUI();
                 clearHighlightedSquares();
                 previousPiece = playerPiece;
                 playerPiece = null;
-                sourceSquare = null;
                 isFirstClick = true;
                 turnCounter++;
-                logTextArea.removeAll();
+
                 if (turnCounter % 2 == 0) {
                     logTextArea.setText(lineBreaks + " It's the white player's turn to move.");
                 } else if (turnCounter % 2 == 1) {
                     logTextArea.setText(lineBreaks+ " It's the black player's turn to move.");
                 }
+
+                handleCheckmate();
+
             } else {
-                logTextArea.setText(lineBreaks + " The square you chose to move to is not a legal move, choose a " +
-                        "piece and try again.");
+
+                logTextArea.setText(lineBreaks + " The square you chose to move to is\n not a legal move, choose a " +
+                        "piece\n and try again.");
                 clearHighlightedSquares();
                 playerPiece = null;
-                sourceSquare = null;
                 isFirstClick = true;
             }
         }
@@ -363,9 +341,11 @@ public class ChessGUI extends JFrame {
                     if (turnCounter % 2 == 0) {
                         previousPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player1.getPlayer());
                         player1.undoCapturePiece(capturedPiece);
+                        player2CapturedPieces.remove(capturedPiece);
                     } else {
                         previousPiece.undoMovePiece(capturedPiece.getChessPieceConstant() + player2.getPlayer());
                         player2.undoCapturePiece(capturedPiece);
+                        player1CapturedPieces.remove(capturedPiece);
                     }
                 } else {
                     previousPiece.undoMovePiece(EMPTY);
@@ -395,10 +375,39 @@ public class ChessGUI extends JFrame {
                 logTextArea.setText(lineBreaks + " You can only undo a previous move \n one time!");
                 turnCounter++;
             }
+            updateCapturedPiecesDisplay();
             updateGUI();
             turnCounter--;
             playerPiece = previousPiece;
+            if (turnCounter % 2 == 0) {
+                logTextArea.setText(lineBreaks + " It's the white player's turn to move.");
+            } else if (turnCounter % 2 == 1) {
+                logTextArea.setText(lineBreaks+ " It's the black player's turn to move.");
+            }
         }
+    }
+
+    private void onPlayAgainButtonClick() {
+        Board.initializeBoard();
+        player1.resetPlayer(PLAYER_1);
+        player2.resetPlayer(PLAYER_2);
+        player1CapturedPieces.clear();
+        player2CapturedPieces.clear();
+
+        turnCounter = 0;
+        hasCastled = false;
+        isFirstClick = true;
+        capturedPiece = null;
+        highlightedSquares.clear();
+        playerPiece = null;
+        previousPiece = null;
+        playAgainButton.setBackground(defaultButtonColor);
+        playAgainButton.setForeground(null);
+
+        updateCapturedPiecesDisplay();
+        updateGUI();
+        logTextArea.setText(lineBreaks + " Welcome to Michael's Chess Game! \n Use the undo button to undo a \n previous move. " +
+                "\n\n It is White's turn to move first.");
     }
 
 
@@ -413,18 +422,32 @@ public class ChessGUI extends JFrame {
     private void updateCapturedPiecesDisplay() {
         player1CapturedArea.removeAll();
         player2CapturedArea.removeAll();
-        player1CapturedArea.add(capturedPiecesTitle);
-        player2CapturedArea.add(capturedPiecesTitle);
+
+        Font capturedPieceFont = new Font("Roboto", Font.PLAIN, 26);
+        Font capturedPiecesTitleFont = new Font("Roboto", Font.BOLD, 24);
+
+        Border paddingBorder = BorderFactory.createEmptyBorder(5, 70, 5, 70);
+        Border lineBorder = BorderFactory.createMatteBorder(0, 0, 2, 0, Color.gray);
+        Border compoundBorder = BorderFactory.createCompoundBorder(lineBorder, paddingBorder);
+
+        JLabel capturedPiecesTitle1 = new JLabel("Captured Pieces");
+        capturedPiecesTitle1.setFont(capturedPiecesTitleFont);
+        capturedPiecesTitle1.setBorder(compoundBorder);
+        JLabel capturedPiecesTitle2 = new JLabel("Captured Pieces");
+        capturedPiecesTitle2.setFont(capturedPiecesTitleFont);
+        capturedPiecesTitle2.setBorder(compoundBorder);
+        player1CapturedArea.add(capturedPiecesTitle1);
+        player2CapturedArea.add(capturedPiecesTitle2);
 
         for (ChessPiece piece : player1CapturedPieces) {
             JLabel blackCapturedPieceLabel = new JLabel(piece.getBlackChessPieceSymbol());
-            blackCapturedPieceLabel.setFont(new Font("Roboto", Font.PLAIN, 26));
+            blackCapturedPieceLabel.setFont(capturedPieceFont);
             player1CapturedArea.add(blackCapturedPieceLabel);
         }
 
         for (ChessPiece piece : player2CapturedPieces) {
             JLabel whiteCapturedPieceLabel = new JLabel(piece.getWhiteChessPieceSymbol());
-            whiteCapturedPieceLabel.setFont(new Font("Roboto", Font.PLAIN, 26));
+            whiteCapturedPieceLabel.setFont(capturedPieceFont);
             player2CapturedArea.add(whiteCapturedPieceLabel);
         }
 
@@ -432,6 +455,53 @@ public class ChessGUI extends JFrame {
         player1CapturedArea.repaint();
         player2CapturedArea.revalidate();
         player2CapturedArea.repaint();
+    }
+
+    private void handlePawnPromotion(int row) {
+
+        if (pawnPromotionFlag) {
+            if (playerPiece instanceof Pawn && (row == 0 || row == 7)) {
+                String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+                int choice = JOptionPane.showOptionDialog(
+                        this,
+                        "Select a piece to promote the pawn to:",
+                        "Pawn Promotion",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        options,
+                        options[0]
+                );
+
+                if (choice >= 0 && choice < options.length) {
+                    String selectedPiece = options[choice];
+                    ((Pawn) playerPiece).promoteTo(selectedPiece);
+                }
+            }
+        }
+
+        pawnPromotionFlag = false;
+    }
+
+    private void handleCheckmate() {
+
+        if ((turnCounter % 2 == 0 && player1.getKing().isInCheck())
+                || (turnCounter % 2 == 1 && player2.getKing().isInCheck())) {
+            logTextArea.setText(lineBreaks + " Check!");
+        }
+
+        if ((turnCounter % 2 == 0 && player1.getMoves().size() == 0) ||
+                (turnCounter % 2 == 1 && player2.getMoves().size() == 0)) {
+
+            if (turnCounter % 2 == 0) {
+                logTextArea.setText(lineBreaks + " Player 2 has won the game! Play\n again?");
+            } else {
+                logTextArea.setText(lineBreaks + " Player 1 has won the game! Play\n again?");
+            }
+
+            playAgainButton.setBackground(Color.GREEN);
+            playAgainButton.setForeground(Color.BLACK);
+        }
     }
 
     private boolean isEmpty(int x, int y) {

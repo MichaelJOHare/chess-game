@@ -53,14 +53,14 @@ public class Play {
         return player2;
     }
 
-    private void pawnPromote(int x, int y, Player player) {
+/*    private void pawnPromote(int x, int y, Player player) {
         switch (userInput.nextInt()) {
             case 1: player.promotePawn(new Rook(new Square(x, y), player1)); break;
             case 2: player.promotePawn(new Knight(new Square(x, y), player1)); break;
             case 3: player.promotePawn(new Bishop(new Square(x, y), player1)); break;
             case 4: player.promotePawn(new Queen(new Square(x, y), player1)); break;
         }
-    }
+    }*/
 
     public void play() {
         displayBoard();
@@ -198,7 +198,7 @@ public class Play {
                             capturedPiece = player2.getPlayerPiece(new Square(x, y));
                             player2.capturePiece(capturedPiece);
                             hasCastled = false;
-                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
+/*                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
                                 System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                         "to promote to rook" +
                                         "\n\n1)Rook" +
@@ -207,12 +207,12 @@ public class Play {
                                         "\n4)Queen" +
                                         "\n\nEnter your choice >>> ");
                                 pawnPromote(x, y, player1);
-                            }
+                            }*/
                         } else {
                             capturedPiece = player1.getPlayerPiece(new Square(x, y));
                             player1.capturePiece(capturedPiece);
                             hasCastled = false;
-                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
+/*                            if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
                                 System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                         "to promote to rook" +
                                         "\n\n1)Rook" +
@@ -221,7 +221,7 @@ public class Play {
                                         "\n4)Queen" +
                                         "\n\nEnter your choice >>> ");
                                 pawnPromote(x, y, player2);
-                            }
+                            }*/
                         }
                     } else {
                         capturedPiece = null;
@@ -251,7 +251,7 @@ public class Play {
                             ((King) playerPiece).hasMoved = true;
                         }
                         if (playerPiece instanceof Rook) ((Rook) playerPiece).hasMoved = true;
-                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
+/*                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 0) {
                             System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                     "to promote to rook" +
                                     "\n\n1)Rook" +
@@ -260,8 +260,8 @@ public class Play {
                                     "\n4)Queen" +
                                     "\n\nEnter your choice >>> ");
                             pawnPromote(x, y, player1);
-                        }
-                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
+                        }*/
+/*                        if (playerPiece instanceof Pawn && playerPiece.getCurrentSquare().getX() == 7) {
                             System.out.print("What do you want to promote to? Enter corresponding number eg. 1 " +
                                     "to promote to rook" +
                                     "\n\n1)Rook" +
@@ -270,7 +270,7 @@ public class Play {
                                     "\n4)Queen" +
                                     "\n\nEnter your choice >>> ");
                             pawnPromote(x, y, player2);
-                        }
+                        }*/
                     }
                     previousPiece = playerPiece;
                     turnCounter++;

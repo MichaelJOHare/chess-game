@@ -89,7 +89,28 @@ public class Pawn extends ChessPiece {
         return availableMoves;
     }
 
+    public void promoteTo(String pieceType) {
+        ChessPiece promotedPiece;
 
+        switch (pieceType) {
+            case "Queen":
+                promotedPiece = new Queen(currentSquare, player);
+                break;
+            case "Rook":
+                promotedPiece = new Rook(currentSquare, player);
+                break;
+            case "Bishop":
+                promotedPiece = new Bishop(currentSquare, player);
+                break;
+            case "Knight":
+                promotedPiece = new Knight(currentSquare, player);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid promotion choice: " + pieceType);
+        }
+
+        player.promotePawn(this, promotedPiece);
+    }
 
     @Override
     public String getChessPieceConstant() {

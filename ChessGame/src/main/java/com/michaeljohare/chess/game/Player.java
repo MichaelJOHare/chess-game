@@ -73,6 +73,12 @@ public class Player {
     public String getPlayer() {
         return player;
     }
+
+    public void resetPlayer(String player) {
+        this.player = player;
+        setPieces();
+    }
+
     public King getKing() {
         return (King) playerPieces[12];
     }
@@ -87,19 +93,21 @@ public class Player {
     }
     public void undoCapturePiece(ChessPiece piece) {
         for (int i = 0; i < 16; i++) {
-            if (!playerPieces[i].isAlive() && playerPieces[i].isAlive()) {
+            if (!playerPieces[i].equals(piece) && playerPieces[i].isAlive()) {
                 piece.undoCapture();
                 break;
             }
         }
     }
 
-    public void promotePawn(ChessPiece piece) {
-        Board.board[piece.getCurrentSquare().getX()][piece.getCurrentSquare().getY()] = piece.getChessPieceConstant() +
-                getPlayer();
+    public void promotePawn(ChessPiece pawn, ChessPiece promotedPiece) {
+        Board.board[pawn.getCurrentSquare().getX()][pawn.getCurrentSquare().getY()] =
+                promotedPiece.getChessPieceConstant() + getPlayer();
+
         for (int i = 0; i < 16; i++) {
-            if (playerPieces[i].getCurrentSquare().equals(piece.getCurrentSquare())) {
-                playerPieces[i] = piece;
+            if (playerPieces[i].getCurrentSquare().equals(pawn.getCurrentSquare())) {
+                playerPieces[i] = promotedPiece;
+                break;
             }
         }
     }
