@@ -36,14 +36,13 @@ public class ChessGUI extends JFrame {
     private final List<ChessPiece> player2CapturedPieces = new ArrayList<>();
     private final List<Square> highlightedSquares = new ArrayList<>();
     private int turnCounter;
-    private boolean player1HasCastled = false;
-    private boolean player2HasCastled = false;
+    private boolean previousMoveWasCastle = false;
     private boolean isFirstClick = true;
     private boolean pawnPromotionFlag = false;
     private ChessPiece playerPiece;
     private ChessPiece capturedPiece;
     private ChessPiece previousPiece;
-    private final String lineBreaks = "\n\n\n\n\n\n";
+    private final String lineBreaks = "\n\n\n\n\n";
 
     public ChessGUI() {
         initializeGUI();
@@ -233,7 +232,7 @@ public class ChessGUI extends JFrame {
 
                 if (moves.size() == 0) {
 
-                    logTextArea.setText(lineBreaks + " The piece you selected does not have any legal moves");
+                    logTextArea.setText(lineBreaks + " The piece you selected does not\n have any legal moves");
                     playerPiece = null;
                     isFirstClick = true;
 
@@ -249,6 +248,9 @@ public class ChessGUI extends JFrame {
 
             Square targetSquare = new Square(row, col);
             if (playerPiece.getMoves().contains(targetSquare)) {
+
+                previousMoveWasCastle = false;
+
                 if (!isEmpty(row, col)) {
                     playerPiece.movePiece(new Square(row, col));
 
@@ -278,22 +280,22 @@ public class ChessGUI extends JFrame {
                         if (turnCounter % 2 == 0 && row == 7 && col == 6) {
                             player1.getPlayerPiece(new Square(7, 7)).movePiece(new Square(7, 5));
                             ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = true;
-                            player1HasCastled = true;
+                            previousMoveWasCastle = true;
                         }
                         if (turnCounter % 2 == 0 && row == 7 && col == 2) {
                             player1.getPlayerPiece(new Square(7, 0)).movePiece(new Square(7, 3));
                             ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = true;
-                            player1HasCastled = true;
+                            previousMoveWasCastle = true;
                         }
                         if (turnCounter % 2 == 1 && row == 0 && col == 6) {
                             player2.getPlayerPiece(new Square(0, 7)).movePiece(new Square(0, 5));
                             ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = true;
-                            player2HasCastled = true;
+                            previousMoveWasCastle = true;
                         }
                         if (turnCounter % 2 == 1 && row == 0 && col == 2) {
                             player2.getPlayerPiece(new Square(0, 0)).movePiece(new Square(0, 3));
                             ((Rook) player2.getPlayerPiece(new Square(0, 3))).hasMoved = true;
-                            player2HasCastled = true;
+                            previousMoveWasCastle = true;
                         }
                         ((King) playerPiece).hasMoved = true;
                     }
@@ -347,10 +349,10 @@ public class ChessGUI extends JFrame {
                         player1CapturedPieces.remove(capturedPiece);
                     }
                 } else {
-                    previousPiece.undoMovePiece(EMPTY);
-                    if (playerPiece instanceof King) ((King) previousPiece).hasMoved = false;
-                    if (playerPiece instanceof Rook) ((Rook) previousPiece).hasMoved = false;
-                    if (turnCounter % 2 == 1 && player1HasCastled) {
+                    if (previousPiece instanceof King) ((King) previousPiece).hasMoved = false;
+                    if (previousPiece instanceof Rook) ((Rook) previousPiece).hasMoved = false;
+
+                    if (turnCounter % 2 == 1 && previousMoveWasCastle) {
                         if (board[7][5].equals(ROOK + PLAYER_1)) {
                             ((Rook) player1.getPlayerPiece(new Square(7, 5))).hasMoved = false;
                             player1.getPlayerPiece(new Square(7, 5)).undoMovePiece(EMPTY);
@@ -358,7 +360,7 @@ public class ChessGUI extends JFrame {
                             ((Rook) player1.getPlayerPiece(new Square(7, 3))).hasMoved = false;
                             player1.getPlayerPiece(new Square(7, 3)).undoMovePiece(EMPTY);
                         }
-                    } else if (turnCounter % 2 == 0 && player2HasCastled){
+                    } else if (turnCounter % 2 == 0 && previousMoveWasCastle){
                         if (board[0][5].equals(ROOK + PLAYER_2)) {
                             ((Rook) player2.getPlayerPiece(new Square(0, 5))).hasMoved = false;
                             player2.getPlayerPiece(new Square(0, 5)).undoMovePiece(EMPTY);
@@ -367,6 +369,7 @@ public class ChessGUI extends JFrame {
                             player2.getPlayerPiece(new Square(0, 3)).undoMovePiece(EMPTY);
                         }
                     }
+                    previousPiece.undoMovePiece(EMPTY);
                 }
             } catch (Exception e) {
                 logTextArea.setText(lineBreaks + " You can only undo a previous move \n one time!");
@@ -375,7 +378,7 @@ public class ChessGUI extends JFrame {
             updateCapturedPiecesDisplay();
             updateGUI();
             turnCounter--;
-            playerPiece = previousPiece;
+            playerPiece = null;
             if (turnCounter % 2 == 0) {
                 logTextArea.setText(lineBreaks + " It's the white player's turn to move.");
             } else if (turnCounter % 2 == 1) {
@@ -392,8 +395,7 @@ public class ChessGUI extends JFrame {
         player2CapturedPieces.clear();
 
         turnCounter = 0;
-        player1HasCastled = false;
-        player2HasCastled = false;
+        previousMoveWasCastle = false;
         isFirstClick = true;
         capturedPiece = null;
         highlightedSquares.clear();
@@ -492,9 +494,9 @@ public class ChessGUI extends JFrame {
                 (turnCounter % 2 == 1 && player2.getMoves().size() == 0)) {
 
             if (turnCounter % 2 == 0) {
-                logTextArea.setText(lineBreaks + " Player 2 has won the game! Play\n again?");
+                logTextArea.setText(lineBreaks + "     Player 2 has won the game!\n\n\tPlay again?");
             } else {
-                logTextArea.setText(lineBreaks + " Player 1 has won the game! Play\n again?");
+                logTextArea.setText(lineBreaks + "     Player 1 has won the game!\n\n\tPlay again?");
             }
 
             playAgainButton.setBackground(Color.GREEN);
